@@ -35,6 +35,10 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="FluentCommandLineParser, Version=1.4.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\FluentCommandLineParser.1.4.3\lib\net35\FluentCommandLineParser.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="PcapDotNet.Base, Version=1.0.1.29386, Culture=neutral, PublicKeyToken=4b6f3e583145a652, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>PcapDotNet\PcapDotNet.Base.dll</HintPath>
@@ -91,6 +95,9 @@
     <Content Include="PcapDotNet\PcapDotNet.Packets.dll" />
     <Content Include="PcapDotNet\PcapDotNet.Packets.pdb" />
     <Content Include="PcapDotNet\PcapDotNet.Packets.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
