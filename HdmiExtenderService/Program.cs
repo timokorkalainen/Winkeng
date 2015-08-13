@@ -14,6 +14,7 @@ namespace HdmiExtenderService
         public bool cmd { get; set; }
         public bool verbose { get; set; }
         public int port { get; set; }
+        public String ip { get; set; }
     }
 
         static class Program
@@ -38,6 +39,11 @@ namespace HdmiExtenderService
              .WithDescription("Port to use for the output streams.")
              .SetDefault(18080);
 
+            cmdParser.Setup(arg => arg.ip)
+             .As('i', "ip")
+             .WithDescription("Input device IP.")
+             .SetDefault("192.168.168.55");
+
             cmdParser.Setup(arg => arg.verbose)
              .As('v', "verbose")
              .WithDescription("Print 'netdrop1' or 'netdrop2'  in the console when a frame is dropped.")
@@ -57,7 +63,7 @@ namespace HdmiExtenderService
                 if (cmdParser.Object.cmd)
                 {
                     MainService svc = new MainService();
-                    VideoWebServer server = new VideoWebServer(cmdParser.Object.port, -1, "192.168.168.55", 1);
+                    VideoWebServer server = new VideoWebServer(cmdParser.Object.port, -1, cmdParser.Object.ip, 1);
                     server.Start();
                     Console.WriteLine("Jpeg still image:");
                     Console.ForegroundColor = ConsoleColor.White;
