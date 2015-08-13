@@ -12,6 +12,7 @@ namespace HdmiExtenderService
     public class ApplicationArguments
     {
         public bool cmd { get; set; }
+        public bool verbose { get; set; }
         public int port { get; set; }
     }
 
@@ -37,11 +38,19 @@ namespace HdmiExtenderService
              .WithDescription("Port to use for the output streams.")
              .SetDefault(18080);
 
+            cmdParser.Setup(arg => arg.verbose)
+             .As('v', "verbose")
+             .WithDescription("Print 'netdrop1' or 'netdrop2'  in the console when a frame is dropped.")
+             .SetDefault(true);
+
+            cmdParser.SetupHelp("h", "help")
+             .Callback(text => Console.WriteLine(text));
+
             //Parse arguments
             var cmdParseResult = cmdParser.Parse(args);
 
             //If no errors, continue
-            if (cmdParseResult.HasErrors == false)
+            if (!cmdParseResult.HasErrors && !cmdParseResult.HelpCalled)
             {
 
                 // Check whether ro run as a service or a console application
