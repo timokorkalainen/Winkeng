@@ -14,6 +14,7 @@ namespace HdmiExtenderService
         public bool cmd { get; set; }
         public bool verbose { get; set; }
         public int port { get; set; }
+        public int networkInterface { get; set; }
         public String ip { get; set; }
     }
 
@@ -39,6 +40,11 @@ namespace HdmiExtenderService
              .WithDescription("Port to use for the output streams.")
              .SetDefault(18080);
 
+            cmdParser.Setup(arg => arg.networkInterface)
+             .As('n', "interface")
+             .WithDescription("Network interface id where the input device is connected to.")
+             .SetDefault(1);
+
             cmdParser.Setup(arg => arg.ip)
              .As('i', "ip")
              .WithDescription("Input device IP.")
@@ -63,7 +69,7 @@ namespace HdmiExtenderService
                 if (cmdParser.Object.cmd)
                 {
                     MainService svc = new MainService();
-                    VideoWebServer server = new VideoWebServer(cmdParser.Object.port, -1, cmdParser.Object.ip, 1);
+                    VideoWebServer server = new VideoWebServer(cmdParser.Object.port, -1, cmdParser.Object.ip, cmdParser.Object.networkInterface);
                     server.Start();
                     Console.WriteLine("Jpeg still image:");
                     Console.ForegroundColor = ConsoleColor.White;
