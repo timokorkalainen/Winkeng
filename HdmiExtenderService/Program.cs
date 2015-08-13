@@ -12,6 +12,7 @@ namespace HdmiExtenderService
     public class ApplicationArguments
     {
         public bool cmd { get; set; }
+        public int port { get; set; }
     }
 
         static class Program
@@ -31,6 +32,11 @@ namespace HdmiExtenderService
              .WithDescription("Run as a console application rather than a Windows Service.")
              .SetDefault(false);
 
+            cmdParser.Setup(arg => arg.port)
+             .As('p', "port")
+             .WithDescription("Port to use for the output streams.")
+             .SetDefault(18080);
+
             //Parse arguments
             var cmdParseResult = cmdParser.Parse(args);
 
@@ -41,26 +47,25 @@ namespace HdmiExtenderService
                 // Check whether ro run as a service or a console application
                 if (cmdParser.Object.cmd)
                 {
-                    ushort port = 18080;
                     MainService svc = new MainService();
-                    VideoWebServer server = new VideoWebServer(port, -1, "192.168.168.55", 1);
+                    VideoWebServer server = new VideoWebServer(cmdParser.Object.port, -1, "192.168.168.55", 1);
                     server.Start();
                     Console.WriteLine("This service was run with the command line argument \"cmd\".");
                     Console.WriteLine("When run without arguments, this application acts as a Windows Service.");
                     Console.WriteLine();
                     Console.WriteLine("Jpeg still image:");
                     Console.ForegroundColor = ConsoleColor.White;
-                    Console.WriteLine("\thttp://localhost:" + port + "/image.jpg");
+                    Console.WriteLine("\thttp://localhost:" + cmdParser.Object.port + "/image.jpg");
                     Console.ResetColor();
                     Console.WriteLine();
                     Console.WriteLine("Motion JPEG:");
                     Console.ForegroundColor = ConsoleColor.White;
-                    Console.WriteLine("\thttp://localhost:" + port + "/image.mjpg");
+                    Console.WriteLine("\thttp://localhost:" + cmdParser.Object.port + "/image.mjpg");
                     Console.ResetColor();
                     Console.WriteLine();
                     Console.WriteLine("PCM 48kHz, Signed 32 bit, Big Endian");
                     Console.ForegroundColor = ConsoleColor.White;
-                    Console.WriteLine("\thttp://localhost:" + port + "/audio.wav");
+                    Console.WriteLine("\thttp://localhost:" + cmdParser.Object.port + "/audio.wav");
                     Console.ResetColor();
                     Console.WriteLine();
                     Console.Write("When you see ");
@@ -73,7 +78,7 @@ namespace HdmiExtenderService
                     Console.ResetColor();
                     Console.WriteLine(" in the console, this means a frame was dropped due to data loss between the Sender device and this program.");
                     Console.WriteLine();
-                    Console.WriteLine("Http server running on port " + port + ". Press ENTER to exit.");
+                    Console.WriteLine("Http server running on port " + cmdParser.Object.port + ". Press ENTER to exit.");
                     Console.ReadLine();
                     Console.WriteLine("Shutting down...");
                     server.Stop();
