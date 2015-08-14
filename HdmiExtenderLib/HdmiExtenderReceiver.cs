@@ -131,9 +131,10 @@ namespace HdmiExtenderLib
 						if (abort)
 							return;
 						if (packet.Ethernet.EtherType == EthernetType.IpV4 &&
-							packet.Ethernet.IpV4.Protocol == IpV4Protocol.Udp)
+							packet.Ethernet.IpV4.Protocol == IpV4Protocol.Udp &&
+                            packet.Ethernet.IpV4.Source.ToString().Equals(addressSenderDevice.ToString()))
 						{
-							if (packet.Ethernet.IpV4.Udp.DestinationPort == 2068)
+                            if (packet.Ethernet.IpV4.Udp.DestinationPort == 2068)
 							{
 								// Video Data
 								// Add lengths of all headers together: ethernet, ipv4, and udp
