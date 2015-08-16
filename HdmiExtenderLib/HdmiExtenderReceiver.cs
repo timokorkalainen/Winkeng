@@ -18,7 +18,9 @@ namespace HdmiExtenderLib
 {
 	public class HdmiExtenderReceiver
 	{
-		private IPAddress addressSenderDevice;
+
+        private Dictionary<IPAddress, HdmiExtenderDevice> devices;
+        
 		private int networkAdapterIndex = 1;
 
 		private Thread thrKeepAlive;
@@ -43,12 +45,15 @@ namespace HdmiExtenderLib
 
 		public HdmiExtenderReceiver(int networkAdapterIndex)
 		{
+            devices = new Dictionary<IPAddress, HdmiExtenderDevice>();
+
 			this.networkAdapterIndex = networkAdapterIndex;
 		}
 
         public void AddDevice(string ipAddressOfSenderDevice)
         {
-            this.addressSenderDevice = IPAddress.Parse(ipAddressOfSenderDevice);
+            IPAddress address = IPAddress.Parse(ipAddressOfSenderDevice);
+            devices.Add(address, new HdmiExtenderDevice(address));
         }
 
 		public void Start()
@@ -136,7 +141,7 @@ namespace HdmiExtenderLib
 							return;
 						if (packet.Ethernet.EtherType == EthernetType.IpV4 &&
 							packet.Ethernet.IpV4.Protocol == IpV4Protocol.Udp &&
-                            packet.Ethernet.IpV4.Source.ToString().Equals(addressSenderDevice.ToString()))
+                            devices.ContainsKey(IPAddress.Parse(packet.Ethernet.IpV4.Source.ToString())))
 						{
                             if (packet.Ethernet.IpV4.Udp.DestinationPort == 2068)
 							{
@@ -184,7 +189,7 @@ namespace HdmiExtenderLib
 					while (!abort)
 					{
 						byte[] data = udp.Receive(ref ep);
-						if (ep.Address.Equals(addressSenderDevice))
+						if (ep.Address.Equals(devices.Keys.First()))
 						{
 							byte[] packetNumberBytes = data.Skip(8).Take(2).ToArray<byte>();
 							UInt16 controlPacketNumber = BitConverter.ToUInt16(packetNumberBytes, 0);
@@ -195,7 +200,7 @@ namespace HdmiExtenderLib
 							hexPacketNumber = hexPacketNumber.Substring(2, 2) + hexPacketNumber.Substring(0, 2);
 							string hexControlPacket = "5446367a60020000" + hexPacketNumber + "000303010026000000000d2fd8";
 							byte[] controlPacket = HexStringToByteArray(hexControlPacket);
-							udp.Send(controlPacket, controlPacket.Length, new IPEndPoint(addressSenderDevice, 48689));
+							udp.Send(controlPacket, controlPacket.Length, new IPEndPoint(devices.Keys.First(), 48689));
 						}
 					}
 				}

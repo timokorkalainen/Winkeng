@@ -64,6 +64,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="HdmiExtenderDevice.cs" />
     <Compile Include="HdmiExtenderReceiver.cs" />
     <Compile Include="HdmiExtenderSender.cs" />
     <Compile Include="HttpServer\Crypto\CertProperties.cs" />
