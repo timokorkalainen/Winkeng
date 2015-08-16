@@ -16,15 +16,32 @@ using PcapDotNet.Packets.Transport;
 
 namespace HdmiExtenderLib
 {
-    class HdmiExtenderDevice
+    public class HdmiExtenderDevice
     {
 
         private IPAddress ip;
 
+        private byte[] latestImage = null;
 
         public HdmiExtenderDevice(IPAddress _ip)
         {
             this.ip = _ip;
+        }
+
+        /// <summary>
+        /// Gets a the latest image data, encoded as image/jpeg.
+        /// </summary>
+        public byte[] LatestImage
+        {
+            get
+            {
+                return latestImage;
+            }
+        }
+
+        public void SetLatestImage(byte[] image)
+        {
+            latestImage = image;
         }
     }
 }

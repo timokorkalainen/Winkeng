@@ -70,8 +70,12 @@ namespace HdmiExtenderService
                     MainService svc = new MainService();
 
                     HdmiExtenderReceiver receiver = new HdmiExtenderReceiver(cmdParser.Object.networkInterface);
-                    receiver.AddDevice(cmdParser.Object.devices[0]);
 
+                    foreach(string ip in cmdParser.Object.devices)
+                    {
+                        receiver.AddDevice(ip);
+                    }
+                    
                     VideoWebServer server = new VideoWebServer(cmdParser.Object.port, -1, receiver);
                     server.Start();
 
@@ -79,17 +83,17 @@ namespace HdmiExtenderService
 
                     Console.WriteLine("Jpeg still image:");
                     Console.ForegroundColor = ConsoleColor.White;
-                    Console.WriteLine("http://localhost:" + cmdParser.Object.port + "/image.jpg");
+                    Console.WriteLine("http://localhost:" + cmdParser.Object.port +"/device ip/image.jpg");
                     Console.ResetColor();
                     Console.WriteLine();
                     Console.WriteLine("Motion JPEG:");
                     Console.ForegroundColor = ConsoleColor.White;
-                    Console.WriteLine("http://localhost:" + cmdParser.Object.port + "/image.mjpg");
+                    Console.WriteLine("http://localhost:" + cmdParser.Object.port + "/device ip/image.mjpg");
                     Console.ResetColor();
                     Console.WriteLine();
                     Console.WriteLine("PCM 48kHz, Signed 32 bit, Big Endian");
                     Console.ForegroundColor = ConsoleColor.White;
-                    Console.WriteLine("http://localhost:" + cmdParser.Object.port + "/audio.wav");
+                    Console.WriteLine("http://localhost:" + cmdParser.Object.port + "/device ip/audio.wav");
                     Console.ResetColor();
                     Console.WriteLine();
                     Console.WriteLine("Press ENTER to exit.");

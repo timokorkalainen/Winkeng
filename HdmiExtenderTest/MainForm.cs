@@ -44,7 +44,7 @@ namespace HdmiExtenderLib
 
 		void timer_Tick(object sender, EventArgs e)
 		{
-			currentImage = receiver.LatestImage;
+			currentImage = receiver.GetDevice("192.168.168.55").LatestImage;
 			if(currentImage != previousImage)
 			{
 				fpsCalc++;

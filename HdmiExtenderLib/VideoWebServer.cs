@@ -24,19 +24,24 @@ namespace HdmiExtenderLib
 		}
 		public override void handleGETRequest(HttpProcessor p)
 		{
-			try
-			{
-				string requestedPage = Uri.UnescapeDataString(p.request_url.AbsolutePath.TrimStart('/'));
-				if (requestedPage == "image.jpg")
+            try
+            {
+                string requestedPage = Uri.UnescapeDataString(p.request_url.AbsolutePath.TrimStart('/'));
+
+                string[] requestedPath = p.request_url.Segments;
+                string requestedDevice = requestedPath[1].TrimStart('/').TrimEnd('/');
+                string requestedMedia = requestedPath[2].TrimStart('/').TrimEnd('/');
+
+                if (requestedMedia == "image.jpg")
 				{
-					byte[] latestImage = receiver.LatestImage;
+					byte[] latestImage = receiver.GetDevice(requestedDevice).LatestImage;
 					if (latestImage == null)
 						latestImage = new byte[0];
 					p.writeSuccess("image/jpeg", latestImage.Length);
 					p.outputStream.Flush();
 					p.rawOutputStream.Write(latestImage, 0, latestImage.Length);
 				}
-				else if (requestedPage.EndsWith("image.mjpg"))
+				else if (requestedMedia.EndsWith("image.mjpg"))
 				{
 					p.tcpClient.ReceiveBufferSize = 4;
 					p.tcpClient.SendBufferSize = 4;
@@ -48,8 +53,8 @@ namespace HdmiExtenderLib
 					{
 						try
 						{
-							currentImage = receiver.LatestImage;
-							if(currentImage == previousImage)
+							currentImage = receiver.GetDevice(requestedDevice).LatestImage;
+                            if (currentImage == previousImage)
 								Thread.Sleep(1);
 							else
 							{
@@ -76,7 +81,7 @@ namespace HdmiExtenderLib
 
 					Console.WriteLine("Ending mjpg stream");
 				}
-				else if (requestedPage == "audio.wav")
+				else if (requestedMedia == "audio.wav")
 				{
 					Console.WriteLine("Beginning audio stream");
 					int? audioRegistrationId = null;

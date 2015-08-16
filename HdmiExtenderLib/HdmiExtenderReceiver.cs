@@ -28,20 +28,8 @@ namespace HdmiExtenderLib
 
 		private volatile bool abort = false;
 
-		private byte[] latestImage = null;
 		private int audioListenerIDCounter = 0;
 		private ConcurrentDictionary<int, ConcurrentQueue<byte[]>> registeredAudioListeners = new ConcurrentDictionary<int, ConcurrentQueue<byte[]>>();
-
-		/// <summary>
-		/// Gets a the latest image data, encoded as image/jpeg.
-		/// </summary>
-		public byte[] LatestImage
-		{
-			get
-			{
-				return latestImage;
-			}
-		}
 
 		public HdmiExtenderReceiver(int networkAdapterIndex)
 		{
@@ -54,6 +42,11 @@ namespace HdmiExtenderLib
         {
             IPAddress address = IPAddress.Parse(ipAddressOfSenderDevice);
             devices.Add(address, new HdmiExtenderDevice(address));
+        }
+
+        public HdmiExtenderDevice GetDevice(string ip)
+        {
+            return devices[IPAddress.Parse(ip)];
         }
 
 		public void Start()
@@ -137,11 +130,13 @@ namespace HdmiExtenderLib
 
 					foreach (Packet packet in query)
 					{
-						if (abort)
+                        IPAddress packetIP = IPAddress.Parse(packet.Ethernet.IpV4.Source.ToString());
+
+                        if (abort)
 							return;
 						if (packet.Ethernet.EtherType == EthernetType.IpV4 &&
 							packet.Ethernet.IpV4.Protocol == IpV4Protocol.Udp &&
-                            devices.ContainsKey(IPAddress.Parse(packet.Ethernet.IpV4.Source.ToString())))
+                            devices.ContainsKey(packetIP))
 						{
                             if (packet.Ethernet.IpV4.Udp.DestinationPort == 2068)
 							{
@@ -152,7 +147,7 @@ namespace HdmiExtenderLib
 								Array.Copy(packet.Buffer, headerLength, data, 0, data.Length);
 								byte[] img = jpgAssembler.AddChunkAndGetNextImage(data);
 								if (img != null)
-									latestImage = img;
+									devices[packetIP].SetLatestImage(img);
 							}
 							else if (packet.Ethernet.IpV4.Udp.DestinationPort == 2066)
 							{
