@@ -41,11 +41,15 @@ namespace HdmiExtenderLib
 			}
 		}
 
-		public HdmiExtenderReceiver(string ipAddressOfSenderDevice, int networkAdapterIndex)
+		public HdmiExtenderReceiver(int networkAdapterIndex)
 		{
-			this.addressSenderDevice = IPAddress.Parse(ipAddressOfSenderDevice);
 			this.networkAdapterIndex = networkAdapterIndex;
 		}
+
+        public void AddDevice(string ipAddressOfSenderDevice)
+        {
+            this.addressSenderDevice = IPAddress.Parse(ipAddressOfSenderDevice);
+        }
 
 		public void Start()
 		{

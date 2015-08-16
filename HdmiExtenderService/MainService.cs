@@ -23,7 +23,8 @@ namespace HdmiExtenderService
 		protected override void OnStart(string[] args)
 		{
 
-            HdmiExtenderReceiver receiver = new HdmiExtenderReceiver("192.168.168.55", 1);
+            HdmiExtenderReceiver receiver = new HdmiExtenderReceiver(1);
+            receiver.AddDevice("192.168.168.55");
 
 			server = new VideoWebServer(18080, -1, receiver);
 			server.Start();

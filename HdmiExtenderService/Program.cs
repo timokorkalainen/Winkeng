@@ -69,7 +69,8 @@ namespace HdmiExtenderService
                 {
                     MainService svc = new MainService();
 
-                    HdmiExtenderReceiver receiver = new HdmiExtenderReceiver(cmdParser.Object.devices[0], cmdParser.Object.networkInterface);
+                    HdmiExtenderReceiver receiver = new HdmiExtenderReceiver(cmdParser.Object.networkInterface);
+                    receiver.AddDevice(cmdParser.Object.devices[0]);
 
                     VideoWebServer server = new VideoWebServer(cmdParser.Object.port, -1, receiver);
                     server.Start();
