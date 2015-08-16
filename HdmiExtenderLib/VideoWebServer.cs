@@ -17,11 +17,10 @@ namespace HdmiExtenderLib
 	{
 		private HdmiExtenderReceiver receiver;
 
-		public VideoWebServer(int port, int port_https, string senderIPAddress, int networkInterfaceIndex)
+		public VideoWebServer(int port, int port_https, HdmiExtenderReceiver _receiver)
 			: base(port, port_https)
 		{
-			receiver = new HdmiExtenderReceiver(senderIPAddress, networkInterfaceIndex);
-			receiver.Start();
+            receiver = _receiver;
 		}
 		public override void handleGETRequest(HttpProcessor p)
 		{
