@@ -88,15 +88,17 @@ namespace HdmiExtenderLib
 					try
 					{
 						ConcurrentQueue<byte[]> audioData = new ConcurrentQueue<byte[]>();
-						audioRegistrationId = receiver.RegisterAudioListener(audioData);
+						audioRegistrationId = receiver.GetDevice(requestedDevice).RegisterAudioListener(audioData);
 
 						p.writeSuccess("audio/x-wav");
 						p.outputStream.Flush();
 						byte[] buffer;
 						while (!this.stopRequested)
 						{
-							while (audioData.TryDequeue(out buffer))
-								p.rawOutputStream.Write(buffer, 0, buffer.Length);
+                            while (audioData.TryDequeue(out buffer))
+                            {
+                                p.rawOutputStream.Write(buffer, 0, buffer.Length);
+                            }
 							Thread.Sleep(1);
 						}
 					}
@@ -109,7 +111,7 @@ namespace HdmiExtenderLib
 					{
 						Console.WriteLine("Ending audio stream");
 						if(audioRegistrationId != null)
-							receiver.UnregisterAudioListener(audioRegistrationId.Value);
+							receiver.GetDevice(requestedDevice).UnregisterAudioListener(audioRegistrationId.Value);
 					}
 				}
 				else if (requestedPage == "raw.html")

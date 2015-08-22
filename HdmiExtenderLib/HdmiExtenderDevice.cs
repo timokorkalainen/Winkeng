@@ -23,6 +23,10 @@ namespace HdmiExtenderLib
 
         private byte[] latestImage = null;
 
+        private int audioListenerIDCounter = 0;
+        private ConcurrentDictionary<int, ConcurrentQueue<byte[]>> registeredAudioListeners = new ConcurrentDictionary<int, ConcurrentQueue<byte[]>>();
+
+
         public HdmiExtenderDevice(IPAddress _ip)
         {
             this.ip = _ip;
@@ -42,6 +46,27 @@ namespace HdmiExtenderLib
         public void SetLatestImage(byte[] image)
         {
             latestImage = image;
+        }
+
+        public int RegisterAudioListener(ConcurrentQueue<byte[]> audioData)
+        {
+            int myKey = Interlocked.Increment(ref audioListenerIDCounter);
+            registeredAudioListeners.AddOrUpdate(myKey, audioData, (key, existingValue) => { return audioData; });
+            return myKey;
+        }
+
+        public void UnregisterAudioListener(int registrationId)
+        {
+            ConcurrentQueue<byte[]> tmp;
+            registeredAudioListeners.TryRemove(registrationId, out tmp);
+        }
+
+        public void AddAudioPacket(byte[] data)
+        {
+            foreach (ConcurrentQueue<byte[]> audioQueue in registeredAudioListeners.Values)
+            {
+                audioQueue.Enqueue(data);
+            }
         }
     }
 }

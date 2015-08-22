@@ -28,9 +28,6 @@ namespace HdmiExtenderLib
 
 		private volatile bool abort = false;
 
-		private int audioListenerIDCounter = 0;
-		private ConcurrentDictionary<int, ConcurrentQueue<byte[]>> registeredAudioListeners = new ConcurrentDictionary<int, ConcurrentQueue<byte[]>>();
-
 		public HdmiExtenderReceiver(int networkAdapterIndex)
 		{
             devices = new Dictionary<IPAddress, HdmiExtenderDevice>();
@@ -79,19 +76,6 @@ namespace HdmiExtenderLib
 			}
 			catch (Exception) { }
 			abort = false;
-		}
-
-		public int RegisterAudioListener(ConcurrentQueue<byte[]> audioData)
-		{
-			int myKey = Interlocked.Increment(ref audioListenerIDCounter);
-			registeredAudioListeners.AddOrUpdate(myKey, audioData, (key, existingValue) => { return audioData; });
-			return myKey;
-		}
-
-		public void UnregisterAudioListener(int registrationId)
-		{
-			ConcurrentQueue<byte[]> tmp;
-			registeredAudioListeners.TryRemove(registrationId, out tmp);
 		}
 
 		/// <summary>
@@ -158,8 +142,10 @@ namespace HdmiExtenderLib
 								headerLength += 16;
 								byte[] data = new byte[packet.Length - headerLength];
 								Array.Copy(packet.Buffer, headerLength, data, 0, data.Length);
-								foreach (ConcurrentQueue<byte[]> audioQueue in registeredAudioListeners.Values)
-									audioQueue.Enqueue(data);
+
+                                //Console.WriteLine(data.Length);
+                                devices[packetIP].AddAudioPacket(data);
+
 							}
 						}
 					}
